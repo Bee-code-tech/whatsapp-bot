@@ -11,7 +11,7 @@ var conn *pgx.Conn
 // ConnectPostgres establishes a connection to the PostgreSQL database
 func ConnectPostgres() error {
     var err error
-    conn, err = pgx.Connect(context.Background(), "postgres://postgres:password@localhost:5432/whatsapp_db")
+    conn, err = pgx.Connect(context.Background(), "postgres://doctorbee:baba2003@localhost:5432/whatsapp-bot")
     if err != nil {
         return err
     }

@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_USER: doctorbee
       POSTGRES_PASSWORD: baba2003
-      POSTGRES_DB: whatsap-bot
+      POSTGRES_DB: whatsapp-bot
     ports:
       - "5432:5432"
     volumes:
