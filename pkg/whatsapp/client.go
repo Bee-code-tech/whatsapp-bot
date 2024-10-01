@@ -13,6 +13,7 @@ import (
     "google.golang.org/protobuf/proto"
 
     "github.com/skip2/go-qrcode" // For generating a QR code image file
+    "os" // For checking file existence
 )
 
 var client *whatsmeow.Client
@@ -37,36 +38,52 @@ func InitializeWhatsAppClient() error {
 
     client = whatsmeow.NewClient(device, logger)
 
-    // Check if the client is logged in
+    // Check if the client is logged in (if no session exists, client.Store.ID will be nil)
     if client.Store.ID == nil {
-        // Not logged in, generate a QR code for login
+        // No session exists, generate a new QR code for login
         qrChan, _ := client.GetQRChannel(context.Background())
         err = client.Connect()
         if err != nil {
             return fmt.Errorf("failed to connect client: %v", err)
         }
 
-        for evt := range qrChan {
-            if evt.Event == "code" {
-                // Save the QR code as an image file (whatsapp-qr.png) with adjusted size
-                fmt.Println("Saving QR code to 'whatsapp-qr.png'...")
+        // Check if the QR code file already exists
+        if _, err := os.Stat("whatsapp-qr.png"); os.IsNotExist(err) {
+            // If the QR code file does not exist, generate it
+            for evt := range qrChan {
+                if evt.Event == "code" {
+                    // Save the QR code as an image file (whatsapp-qr.png) with adjusted size
+                    fmt.Println("Saving QR code to 'whatsapp-qr.png'...")
 
-                // Generate a smaller QR code image (200x200 with high error correction)
-                err := qrcode.WriteFile(evt.Code, qrcode.High, 200, "whatsapp-qr.png")
-                if err != nil {
-                    return fmt.Errorf("failed to generate QR code image: %v", err)
+                    // Generate a smaller QR code image (200x200 with high error correction)
+                    err := qrcode.WriteFile(evt.Code, qrcode.High, 200, "whatsapp-qr.png")
+                    if err != nil {
+                        return fmt.Errorf("failed to generate QR code image: %v", err)
+                    }
+
+                    fmt.Println("QR code saved successfully. Open 'whatsapp-qr.png' and scan it with WhatsApp.")
+                    break // Once QR code is saved, stop further processing
                 }
-
-                fmt.Println("QR code saved successfully. Open 'whatsapp-qr.png' and scan it with WhatsApp.")
-                break // Once QR code is saved, stop further processing
             }
+        } else {
+            fmt.Println("'whatsapp-qr.png' already exists. Please scan it.")
         }
+
     } else {
+        // Session exists, connect using it
         err = client.Connect()
         if err != nil {
             return fmt.Errorf("failed to connect client: %v", err)
         }
         fmt.Println("WhatsApp client connected successfully!")
+
+        // Send a message to yourself after connecting
+        // Replace "+1234567890@s.whatsapp.net" with your phone number in JID format (e.g., "+1XXXXXXXXXX@s.whatsapp.net")
+        err = SendMessage("2349030181582@s.whatsapp.net", "Another message to let you know the bot is active!")
+        if err != nil {
+            return fmt.Errorf("failed to send message: %v", err)
+        }
+        fmt.Println("Message sent successfully: Hello bot is active")
     }
 
     return nil
