@@ -9,21 +9,21 @@ import (
     waLog "go.mau.fi/whatsmeow/util/log"
     "go.mau.fi/whatsmeow/types"
     waProto "go.mau.fi/whatsmeow/binary/proto"
-    _ "github.com/mattn/go-sqlite3"
+    _ "github.com/jackc/pgx/v4/stdlib" // PostgreSQL driver for WhatsMeow session store
     "google.golang.org/protobuf/proto"
 
     "github.com/skip2/go-qrcode" // For generating a QR code image file
-    "github.com/Baozisoftware/qrcode-terminal-go" // For rendering the QR code in the terminal
 )
 
 var client *whatsmeow.Client
 
 // InitializeWhatsAppClient initializes the WhatsMeow client and handles login via QR code
 func InitializeWhatsAppClient() error {
-    // Initialize session store (SQLite, replace with PostgreSQL later if needed)
-    container, err := sqlstore.New("sqlite3", "file:whatsapp-session.db?_foreign_keys=on", nil)
+    // Use PostgreSQL for session storage
+    connString := "user=doctorbee password=baba2003 host=localhost dbname=whatsapp-bot sslmode=disable"
+    container, err := sqlstore.New("pgx", connString, nil)
     if err != nil {
-        return fmt.Errorf("failed to initialize session store: %v", err)
+        return fmt.Errorf("failed to initialize PostgreSQL session store: %v", err)
     }
 
     // Get device from session container
@@ -48,7 +48,7 @@ func InitializeWhatsAppClient() error {
 
         for evt := range qrChan {
             if evt.Event == "code" {
-                // Option 1: Save the QR code as an image file (whatsapp-qr.png) with adjusted size
+                // Save the QR code as an image file (whatsapp-qr.png) with adjusted size
                 fmt.Println("Saving QR code to 'whatsapp-qr.png'...")
 
                 // Generate a smaller QR code image (200x200 with high error correction)
@@ -58,13 +58,7 @@ func InitializeWhatsAppClient() error {
                 }
 
                 fmt.Println("QR code saved successfully. Open 'whatsapp-qr.png' and scan it with WhatsApp.")
-
-                // Option 2: Print the QR code directly in the terminal
-                fmt.Println("Alternatively, scan the QR code below:")
-                qrcodeTerminal := qrcodeTerminal.New()
-                qrcodeTerminal.Get(evt.Code).Print()
-            } else {
-                fmt.Println("Login event:", evt.Event)
+                break // Once QR code is saved, stop further processing
             }
         }
     } else {
