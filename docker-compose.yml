@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres:14-alpine
-    container_name: whatsapp_bot_db
+    container_name: whatsapp-bot
     restart: always
     environment:
       POSTGRES_USER: doctorbee

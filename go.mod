@@ -5,9 +5,12 @@ go 1.22.0
 toolchain go1.23.1
 
 require (
+	github.com/Baozisoftware/qrcode-terminal-go v0.0.0-20170407111555-c0650d8dff0f
 	github.com/jackc/pgx/v4 v4.18.3
 	github.com/mattn/go-sqlite3 v1.14.23
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	go.mau.fi/whatsmeow v0.0.0-20240930130510-b12cf9c9deda
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
@@ -30,5 +33,4 @@ require (
 	golang.org/x/net v0.29.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 	golang.org/x/text v0.18.0 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
 )
