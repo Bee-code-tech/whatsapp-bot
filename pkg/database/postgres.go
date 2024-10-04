@@ -31,7 +31,7 @@ func StoreSession(userID int, session []byte) error {
     return err
 }
 
-// GetSession retrieves the WhatsApp session data from the database
+// GetSession retrieves the WhatsApp session data from the database..
 func GetSession(userID int) ([]byte, error) {
     var session []byte
     err := conn.QueryRow(context.Background(), "SELECT session_data FROM whatsapp_sessions WHERE user_id=$1", userID).Scan(&session)
