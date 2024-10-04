@@ -26,6 +26,7 @@ func SendMessageHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 
+    // write head and send message to the number 
     w.WriteHeader(http.StatusOK)
     w.Write([]byte("Message sent successfully!"))
 }
